@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Depreciación</title>
+    <style>
+/* Variables CSS para colores y espaciado */
+:root {
+    --primary-color: #4a90e2;
+    --primary-dark: #357abd;
+    --secondary-color: #f8f9fa;
+    --accent-color: #28a745;
+    --danger-color: #dc3545;
+    --text-dark: #2c3e50;
+    --text-light: #6c757d;
+    --border-color: #dee2e6;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.15);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+/* Reset y estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-dark);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Container principal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem 0;
+}
+
+header h1 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+/* Main content */
+main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Calculator section */
+.calculator-section {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.calculator-section:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Input groups */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-group label {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.input-group input,
+.input-group select {
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background-color: #fff;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.input-group input:hover,
+.input-group select:hover {
+    border-color: var(--primary-dark);
+}
+
+/* Button group */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.calculate-btn,
+.clear-btn {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calculate-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.calculate-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.clear-btn {
+    background-color: var(--text-light);
+    color: white;
+}
+
+.clear-btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.calculate-btn:active,
+.clear-btn:active {
+    transform: translateY(0);
+}
+
+/* Results section */
+.results-section {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    transition: var(--transition);
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.results-section:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.results-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.results-header h2 {
+    color: var(--text-dark);
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.method-info {
+    color: var(--text-light);
+    font-style: italic;
+    font-size: 0.95rem;
+}
+
+/* Results content */
+.results-content {
+    display: none;
+}
+
+.results-content.show {
+    display: block;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Summary cards */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: var(--secondary-color);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    border-left: 4px solid var(--primary-color);
+}
+
+.summary-card h3 {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.summary-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* Results table */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+}
+
+.results-table th,
+.results-table td {
+    padding: 0.75rem;
+    text-align: right;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.results-table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+}
+
+.results-table th:first-child,
+.results-table td:first-child {
+    text-align: center;
+}
+
+.results-table tbody tr:nth-child(even) {
+    background-color: rgba(74, 144, 226, 0.05);
+}
+
+.results-table tbody tr:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+    transform: scale(1.01);
+    transition: var(--transition);
+}
+
+.currency {
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+/* Error messages */
+.error-message {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--danger-color);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--danger-color);
+    margin: 1rem 0;
+    font-weight: 500;
+}
+
+/* Success messages */
+.success-message {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--accent-color);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--accent-color);
+    margin: 1rem 0;
+    font-weight: 500;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 2rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    main {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .results-table {
+        font-size: 0.85rem;
+    }
+    
+    .results-table th,
+    .results-table td {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .calculator-section,
+    .results-section {
+        padding: 1.5rem;
+    }
+    
+    header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+}
+
+/* Loading animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calculadora de Depreciación</h1>
+            <p class="subtitle">Calcula la depreciación de tus activos con métodos profesionales</p>
+        </header>
+
+        <main>
+            <section class="calculator-section">
+                <form id="depreciation-form" class="form-container">
+                    <div class="input-group">
+                        <label for="costo-activo">Costo del Activo ($)</label>
+                        <input 
+                            type="number" 
+                            id="costo-activo" 
+                            name="costoActivo" 
+                            step="0.01" 
+                            min="0" 
+                            placeholder="Ej: 100000"
+                            required
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="valor-residual">Valor Residual ($)</label>
+                        <input 
+                            type="number" 
+                            id="valor-residual" 
+                            name="valorResidual" 
+                            step="0.01" 
+                            min="0" 
+                            placeholder="Ej: 10000"
+                            required
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="vida-util">Vida Útil (años)</label>
+                        <input 
+                            type="number" 
+                            id="vida-util" 
+                            name="vidaUtil" 
+                            min="1" 
+                            max="100" 
+                            placeholder="Ej: 5"
+                            required
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="metodo-depreciacion">Método de Depreciación</label>
+                        <select id="metodo-depreciacion" name="metodoDepreciacion" required>
+                            <option value="">Selecciona un método</option>
+                            <option value="linea-recta">Línea Recta</option>
+                            <option value="suma-digitos">Suma de Dígitos de los Años</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" id="calcular-btn" class="calculate-btn">
+                            Calcular Depreciación
+                        </button>
+                        <button type="button" id="limpiar-btn" class="clear-btn">
+                            Limpiar
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="results-section" id="results-section">
+                <div class="results-header">
+                    <h2>Resultados de Depreciación</h2>
+                    <div class="method-info" id="method-info"></div>
+                </div>
+                <div class="results-content" id="results-content">
+                    <!-- Los resultados se generarán dinámicamente aquí -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Calculadora de Depreciación - Herramienta Financiera</p>
+        </footer>
+    </div>
+
+    <script>
+// Variables y elementos del DOM
+const form = document.getElementById('depreciation-form');
+const costoActivoInput = document.getElementById('costo-activo');
+const valorResidualInput = document.getElementById('valor-residual');
+const vidaUtilInput = document.getElementById('vida-util');
+const metodoSelect = document.getElementById('metodo-depreciacion');
+const calcularBtn = document.getElementById('calcular-btn');
+const limpiarBtn = document.getElementById('limpiar-btn');
+const resultsSection = document.getElementById('results-section');
+const resultsContent = document.getElementById('results-content');
+const methodInfo = document.getElementById('method-info');
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listener para el formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        calcularDepreciacion();
+    });
+
+    // Event listener para el botón limpiar
+    limpiarBtn.addEventListener('click', limpiarFormulario);
+
+    // Event listeners para validación en tiempo real
+    costoActivoInput.addEventListener('input', validarCostoMayorQueResidual);
+    valorResidualInput.addEventListener('input', validarCostoMayorQueResidual);
+});
+
+// Función principal para calcular depreciación
+function calcularDepreciacion() {
+    try {
+        // Obtener y validar valores de entrada
+        const costoActivo = obtenerValorNumerico(costoActivoInput.value);
+        const valorResidual = obtenerValorNumerico(valorResidualInput.value);
+        const vidaUtil = parseInt(vidaUtilInput.value);
+        const metodoSeleccionado = metodoSelect.value;
+
+        // Validaciones
+        if (!validarEntradas(costoActivo, valorResidual, vidaUtil, metodoSeleccionado)) {
+            return;
+        }
+
+        // Mostrar indicador de carga
+        mostrarCargando();
+
+        // Calcular según el método seleccionado
+        let resultados;
+        switch (metodoSeleccionado) {
+            case 'linea-recta':
+                resultados = calcularLineaRecta(costoActivo, valorResidual, vidaUtil);
+                break;
+            case 'suma-digitos':
+                resultados = calcularSumaDigitos(costoActivo, valorResidual, vidaUtil);
+                break;
+            default:
+                mostrarError('Por favor selecciona un método de depreciación válido.');
+                return;
+        }
+
+        // Mostrar resultados
+        mostrarResultados(resultados, metodoSeleccionado);
+        
+    } catch (error) {
+        console.error('Error en el cálculo:', error);
+        mostrarError('Ha ocurrido un error en el cálculo. Por favor verifica los datos ingresados.');
+    }
+}
+
+// Función para obtener valor numérico válido
+function obtenerValorNumerico(valor) {
+    const numero = parseFloat(valor);
+    return isNaN(numero) ? 0 : numero;
+}
+
+// Función de validación de entradas
+function validarEntradas(costoActivo, valorResidual, vidaUtil, metodoSeleccionado) {
+    // Limpiar mensajes de error previos
+    limpiarMensajesError();
+
+    let esValido = true;
+    let errores = [];
+
+    // Validar costo del activo
+    if (costoActivo <= 0) {
+        errores.push('El costo del activo debe ser mayor a cero.');
+        esValido = false;
+    }
+
+    // Validar valor residual
+    if (valorResidual < 0) {
+        errores.push('El valor residual no puede ser negativo.');
+        esValido = false;
+    }
+
+    // Validar que el costo sea mayor al valor residual
+    if (costoActivo <= valorResidual) {
+        errores.push('El costo del activo debe ser mayor al valor residual.');
+        esValido = false;
+    }
+
+    // Validar vida útil
+    if (vidaUtil <= 0 || vidaUtil > 100) {
+        errores.push('La vida útil debe estar entre 1 y 100 años.');
+        esValido = false;
+    }
+
+    // Validar método seleccionado
+    if (!metodoSeleccionado) {
+        errores.push('Por favor selecciona un método de depreciación.');
+        esValido = false;
+    }
+
+    // Mostrar errores si los hay
+    if (!esValido) {
+        mostrarError(errores.join('<br>'));
+    }
+
+    return esValido;
+}
+
+// Validación en tiempo real para costo y valor residual
+function validarCostoMayorQueResidual() {
+    const costoActivo = obtenerValorNumerico(costoActivoInput.value);
+    const valorResidual = obtenerValorNumerico(valorResidualInput.value);
+    
+    if (costoActivo > 0 && valorResidual >= 0 && costoActivo <= valorResidual) {
+        costoActivoInput.style.borderColor = '#dc3545';
+        valorResidualInput.style.borderColor = '#dc3545';
+    } else {
+        costoActivoInput.style.borderColor = '#dee2e6';
+        valorResidualInput.style.borderColor = '#dee2e6';
+    }
+}
+
+// Método de Línea Recta
+function calcularLineaRecta(costoActivo, valorResidual, vidaUtil) {
+    const montoDepreciable = costoActivo - valorResidual;
+    const depreciacionAnual = montoDepreciable / vidaUtil;
+    
+    const resultados = {
+        metodo: 'Línea Recta',
+        descripcion: 'Método que distribuye el costo del activo uniformemente a lo largo de su vida útil.',
+        costoActivo: costoActivo,
+        valorResidual: valorResidual,
+        vidaUtil: vidaUtil,
+        montoDepreciable: montoDepreciable,
+        depreciacionAnual: depreciacionAnual,
+        años: []
+    };
+
+    let valorLibros = costoActivo;
+    
+    for (let año = 1; año <= vidaUtil; año++) {
+        const depreciacionAño = depreciacionAnual;
+        const depreciacionAcumulada = depreciacionAnual * año;
+        valorLibros = costoActivo - depreciacionAcumulada;
+        
+        resultados.años.push({
+            año: año,
+            depreciacionAnual: depreciacionAño,
+            depreciacionAcumulada: depreciacionAcumulada,
+            valorLibros: Math.max(valorLibros, valorResidual) // No puede ser menor al valor residual
+        });
+    }
+
+    return resultados;
+}
+
+// Método de Suma de los Dígitos de los Años
+function calcularSumaDigitos(costoActivo, valorResidual, vidaUtil) {
+    const montoDepreciable = costoActivo - valorResidual;
+    const sumaDigitos = (vidaUtil * (vidaUtil + 1)) / 2;
+    
+    const resultados = {
+        metodo: 'Suma de los Dígitos de los Años',
+        descripcion: 'Método acelerado que asigna mayor depreciación en los primeros años de vida del activo.',
+        costoActivo: costoActivo,
+        valorResidual: valorResidual,
+        vidaUtil: vidaUtil,
+        montoDepreciable: montoDepreciable,
+        sumaDigitos: sumaDigitos,
+        años: []
+    };
+
+    let depreciacionAcumuladaTotal = 0;
+    
+    for (let año = 1; año <= vidaUtil; año++) {
+        const añosRestantes = vidaUtil - año + 1;
+        const factor = añosRestantes / sumaDigitos;
+        const depreciacionAnual = montoDepreciable * factor;
+        depreciacionAcumuladaTotal += depreciacionAnual;
+        const valorLibros = costoActivo - depreciacionAcumuladaTotal;
+        
+        resultados.años.push({
+            año: año,
+            añosRestantes: añosRestantes,
+            factor: factor,
+            depreciacionAnual: depreciacionAnual,
+            depreciacionAcumulada: depreciacionAcumuladaTotal,
+            valorLibros: Math.max(valorLibros, valorResidual) // No puede ser menor al valor residual
+        });
+    }
+
+    return resultados;
+}
+
+// Función para mostrar resultados
+function mostrarResultados(resultados, metodoSeleccionado) {
+    // Actualizar información del método
+    methodInfo.innerHTML = '<strong>' + resultados.metodo + ':</strong> ' + resultados.descripcion;
+    
+    // Crear HTML de resultados
+    let html = '<div class="summary-cards">' +
+        '<div class="summary-card">' +
+            '<h3>Costo del Activo</h3>' +
+            '<div class="value currency">$' + formatearNumero(resultados.costoActivo) + '</div>' +
+        '</div>' +
+        '<div class="summary-card">' +
+            '<h3>Valor Residual</h3>' +
+            '<div class="value currency">$' + formatearNumero(resultados.valorResidual) + '</div>' +
+        '</div>' +
+        '<div class="summary-card">' +
+            '<h3>Vida Útil</h3>' +
+            '<div class="value">' + resultados.vidaUtil + ' años</div>' +
+        '</div>' +
+        '<div class="summary-card">' +
+            '<h3>Monto Depreciable</h3>' +
+            '<div class="value currency">$' + formatearNumero(resultados.montoDepreciable) + '</div>' +
+        '</div>' +
+    '</div>';
+
+    // Agregar información específica del método
+    if (metodoSeleccionado === 'linea-recta') {
+        html += '<div class="summary-cards">' +
+            '<div class="summary-card">' +
+                '<h3>Depreciación Anual</h3>' +
+                '<div class="value currency">$' + formatearNumero(resultados.depreciacionAnual) + '</div>' +
+            '</div>' +
+        '</div>';
+    } else if (metodoSeleccionado === 'suma-digitos') {
+        html += '<div class="summary-cards">' +
+            '<div class="summary-card">' +
+                '<h3>Suma de Dígitos</h3>' +
+                '<div class="value">' + resultados.sumaDigitos + '</div>' +
+            '</div>' +
+        '</div>';
+    }
+
+    // Crear tabla de resultados anuales
+    html += '<table class="results-table">' +
+        '<thead>' +
+            '<tr>' +
+                '<th>Año</th>' +
+                (metodoSeleccionado === 'suma-digitos' ? '<th>Años Restantes</th><th>Factor</th>' : '') +
+                '<th>Depreciación Anual</th>' +
+                '<th>Depreciación Acumulada</th>' +
+                '<th>Valor en Libros</th>' +
+            '</tr>' +
+        '</thead>' +
+        '<tbody>';
+
+    // Agregar filas de la tabla
+    resultados.años.forEach(function(año) {
+        html += '<tr>' +
+            '<td>' + año.año + '</td>' +
+            (metodoSeleccionado === 'suma-digitos' ? 
+                '<td>' + año.añosRestantes + '</td><td>' + (año.factor * 100).toFixed(2) + '%</td>' : '') +
+            '<td class="currency">$' + formatearNumero(año.depreciacionAnual) + '</td>' +
+            '<td class="currency">$' + formatearNumero(año.depreciacionAcumulada) + '</td>' +
+            '<td class="currency">$' + formatearNumero(año.valorLibros) + '</td>' +
+        '</tr>';
+    });
+
+    html += '</tbody></table>';
+
+    // Mostrar resultados con animación
+    resultsContent.innerHTML = html;
+    resultsContent.classList.add('show');
+    
+    // Scroll suave hacia los resultados
+    resultsSection.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+    });
+}
+
+// Función para formatear números con separadores de miles y decimales
+function formatearNumero(numero) {
+    return new Intl.NumberFormat('es-ES', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(numero);
+}
+
+// Función para mostrar indicador de carga
+function mostrarCargando() {
+    calcularBtn.innerHTML = '<span class="loading"></span> Calculando...';
+    calcularBtn.disabled = true;
+    
+    // Simular delay para mostrar loading (opcional)
+    setTimeout(function() {
+        calcularBtn.innerHTML = 'Calcular Depreciación';
+        calcularBtn.disabled = false;
+    }, 1000);
+}
+
+// Función para limpiar formulario
+function limpiarFormulario() {
+    // Limpiar campos del formulario
+    form.reset();
+    
+    // Ocultar resultados
+    resultsContent.classList.remove('show');
+    resultsContent.innerHTML = '';
+    methodInfo.innerHTML = '';
+    
+    // Limpiar estilos de validación
+    costoActivoInput.style.borderColor = '#dee2e6';
+    valorResidualInput.style.borderColor = '#dee2e6';
+    
+    // Limpiar mensajes de error
+    limpiarMensajesError();
+    
+    // Enfocar en el primer campo
+    costoActivoInput.focus();
+    
+    // Mostrar mensaje de confirmación
+    mostrarExito('Formulario limpiado correctamente.');
+}
+
+// Función para mostrar mensajes de error
+function mostrarError(mensaje) {
+    limpiarMensajesError();
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.innerHTML = '⚠️ ' + mensaje;
+    
+    // Insertar antes del formulario
+    form.parentNode.insertBefore(errorDiv, form);
+    
+    // Auto-remover después de 5 segundos
+    setTimeout(function() {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 5000);
+}
+
+// Función para mostrar mensajes de éxito
+function mostrarExito(mensaje) {
+    limpiarMensajesError();
+    
+    const exitoDiv = document.createElement('div');
+    exitoDiv.className = 'success-message';
+    exitoDiv.innerHTML = '✅ ' + mensaje;
+    
+    // Insertar antes del formulario
+    form.parentNode.insertBefore(exitoDiv, form);
+    
+    // Auto-remover después de 3 segundos
+    setTimeout(function() {
+        if (exitoDiv.parentNode) {
+            exitoDiv.remove();
+        }
+    }, 3000);
+}
+
+// Función para limpiar mensajes de error y éxito
+function limpiarMensajesError() {
+    const mensajes = document.querySelectorAll('.error-message, .success-message');
+    mensajes.forEach(function(mensaje) {
+        mensaje.remove();
+    });
+}
+    </script>
+</body>
+</html>
