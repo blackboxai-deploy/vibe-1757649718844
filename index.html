@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Depreciación</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Calculadora de Depreciación</h1>
+            <p class="subtitle">Calcula la depreciación de tus activos con métodos profesionales</p>
+        </header>
+
+        <main>
+            <section class="calculator-section">
+                <form id="depreciation-form" class="form-container">
+                    <div class="input-group">
+                        <label for="costo-activo">Costo del Activo ($)</label>
+                        <input 
+                            type="number" 
+                            id="costo-activo" 
+                            name="costoActivo" 
+                            step="0.01" 
+                            min="0" 
+                            placeholder="Ej: 100000"
+                            required
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="valor-residual">Valor Residual ($)</label>
+                        <input 
+                            type="number" 
+                            id="valor-residual" 
+                            name="valorResidual" 
+                            step="0.01" 
+                            min="0" 
+                            placeholder="Ej: 10000"
+                            required
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="vida-util">Vida Útil (años)</label>
+                        <input 
+                            type="number" 
+                            id="vida-util" 
+                            name="vidaUtil" 
+                            min="1" 
+                            max="100" 
+                            placeholder="Ej: 5"
+                            required
+                        />
+                    </div>
+
+                    <div class="input-group">
+                        <label for="metodo-depreciacion">Método de Depreciación</label>
+                        <select id="metodo-depreciacion" name="metodoDepreciacion" required>
+                            <option value="">Selecciona un método</option>
+                            <option value="linea-recta">Línea Recta</option>
+                            <option value="suma-digitos">Suma de Dígitos de los Años</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" id="calcular-btn" class="calculate-btn">
+                            Calcular Depreciación
+                        </button>
+                        <button type="button" id="limpiar-btn" class="clear-btn">
+                            Limpiar
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="results-section" id="results-section">
+                <div class="results-header">
+                    <h2>Resultados de Depreciación</h2>
+                    <div class="method-info" id="method-info"></div>
+                </div>
+                <div class="results-content" id="results-content">
+                    <!-- Los resultados se generarán dinámicamente aquí -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Calculadora de Depreciación - Herramienta Financiera</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
